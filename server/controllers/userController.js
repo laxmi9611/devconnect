@@ -9,10 +9,12 @@ exports.getUserProfile = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const [posts, followers, following] = await Promise.all([
-      Post.find({ author: user._id }).sort({ createdAt: -1 }),
-      Follow.countDocuments({ following: user._id }),
-      Follow.countDocuments({ follower: user._id }),
-    ]);
+  Post.find({ author: user._id })
+    .populate("author", "name username avatar")
+    .sort({ createdAt: -1 }),
+  Follow.countDocuments({ following: user._id }),
+  Follow.countDocuments({ follower: user._id }),
+]);
 
     res.json({ user, posts, followers, following });
   } catch (err) {
